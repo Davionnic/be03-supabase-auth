@@ -33,8 +33,12 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-# Auth helper function
-async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+# Auth middleware dependency
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Reusable FastAPI dependency for authentication.
+    Validates Bearer token and returns the current user.
+    """
     try:
         if not credentials or not credentials.credentials:
             raise HTTPException(
@@ -155,6 +159,18 @@ async def login(user_data: UserLogin):
             detail=error_message
         )
 
+@app.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(current_user=Depends(get_current_user)):
+    try:
+        # Sign out user from Supabase
+        supabase.auth.sign_out()
+        return None  # 204 No Content
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to logout"
+        )
+
 # Public routes
 @app.get("/public/info")
 async def public_info():
@@ -162,7 +178,7 @@ async def public_info():
 
 # Protected routes with proper token verification
 @app.get("/protected/profile")
-async def get_profile(current_user=Depends(verify_token)):
+async def get_profile(current_user=Depends(get_current_user)):
     return {
         "id": current_user.id,
         "email": current_user.email,
@@ -170,7 +186,7 @@ async def get_profile(current_user=Depends(verify_token)):
     }
 
 @app.get("/protected/dashboard")
-async def get_dashboard(current_user=Depends(verify_token)):
+async def get_dashboard(current_user=Depends(get_current_user)):
     return {
         "message": "Welcome to your dashboard!",
         "user_id": current_user.id,

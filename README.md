@@ -21,10 +21,7 @@ SUPABASE_KEY=your_supabase_anon_key
 PORT=8000
 ```
 
-**Note**: 
-- Use `.env.example` as a template. Never commit real credentials to version control.
-- The provided Supabase credentials in the task are incomplete. You'll need a full anon key from your Supabase project.
-- A complete anon key typically looks like: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (much longer)
+**Note**: Use `.env.example` as a template. Never commit real credentials to version control.
 
 ## Installation & Setup
 

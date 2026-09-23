@@ -12,7 +12,7 @@ load_dotenv()
 
 app = FastAPI(
     title="FlyRank BE-03 Auth API",
-    description="Authentication system using FastAPI and Supabase",
+    description="Authentication system using FastAPI and Supabase with Bearer token authentication",
     version="1.0.0"
 )
 
@@ -73,7 +73,10 @@ async def root():
     return {"message": "FlyRank BE-03 Auth API is running"}
 
 # Auth routes
-@app.post("/auth/signup", status_code=status.HTTP_201_CREATED)
+@app.post("/auth/signup", 
+         status_code=status.HTTP_201_CREATED,
+         summary="User Registration",
+         description="Create a new user account with email and password")
 async def signup(user_data: UserSignup):
     try:
         # Check if email and password are provided
@@ -116,7 +119,10 @@ async def signup(user_data: UserSignup):
             detail=error_message
         )
 
-@app.post("/auth/login", status_code=status.HTTP_200_OK)
+@app.post("/auth/login", 
+         status_code=status.HTTP_200_OK,
+         summary="User Login",
+         description="Authenticate user and receive access tokens")
 async def login(user_data: UserLogin):
     try:
         # Check if email and password are provided
@@ -159,7 +165,10 @@ async def login(user_data: UserLogin):
             detail=error_message
         )
 
-@app.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
+@app.post("/auth/logout", 
+         status_code=status.HTTP_204_NO_CONTENT,
+         summary="User Logout",
+         description="Sign out the current user (requires Bearer token)")
 async def logout(current_user=Depends(get_current_user)):
     try:
         # Sign out user from Supabase
@@ -172,12 +181,16 @@ async def logout(current_user=Depends(get_current_user)):
         )
 
 # Public routes
-@app.get("/public/info")
+@app.get("/public/info",
+         summary="Public Information",
+         description="Get public information - no authentication required")
 async def public_info():
     return {"message": "Welcome stranger! This info is public."}
 
 # Protected routes with proper token verification
-@app.get("/protected/profile")
+@app.get("/protected/profile",
+         summary="User Profile",
+         description="Get current user profile information (requires Bearer token)")
 async def get_profile(current_user=Depends(get_current_user)):
     return {
         "id": current_user.id,
@@ -185,7 +198,9 @@ async def get_profile(current_user=Depends(get_current_user)):
         "created_at": current_user.created_at
     }
 
-@app.get("/protected/dashboard")
+@app.get("/protected/dashboard",
+         summary="User Dashboard", 
+         description="Access user dashboard (requires Bearer token)")
 async def get_dashboard(current_user=Depends(get_current_user)):
     return {
         "message": "Welcome to your dashboard!",

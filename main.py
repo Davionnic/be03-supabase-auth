@@ -120,6 +120,29 @@ async def login(user_data: UserLogin):
             detail=error_message
         )
 
+# Public routes
+@app.get("/public/info")
+async def public_info():
+    return {"message": "Welcome stranger! This info is public."}
+
+# Protected routes (basic implementation without proper auth verification)
+@app.get("/protected/profile")
+async def get_profile():
+    # TODO: Add proper token verification in Stage 3
+    return {
+        "id": "temp-user-id",
+        "email": "temp@example.com", 
+        "created_at": "2024-01-01T00:00:00Z"
+    }
+
+@app.get("/protected/dashboard")
+async def get_dashboard():
+    # TODO: Add proper token verification in Stage 3
+    return {
+        "message": "Welcome to your dashboard!",
+        "user_id": "temp-user-id"
+    }
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
